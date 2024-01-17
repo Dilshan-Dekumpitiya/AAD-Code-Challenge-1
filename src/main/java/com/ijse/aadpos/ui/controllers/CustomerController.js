@@ -1,25 +1,79 @@
+var row_index = null;
+var allItem;
+var lastCustomer;
+var customerCount;
+
 /** Save Customer * */
-$("#btnCSave").click(function () {
+// $("#btnCSave").click(function () {
+//
+//     // Create Object
+//     let CustomerArray = new customer(
+//         $("#txtCustomerId").val(),
+//         $("#txtCustomerName").val(),
+//         $("#txtCustomerAddress").val(),
+//         $("#txtCustomerSalary").val()
+//     );
+//
+//     clearTextFieldsC();
+//
+//     // Alert Save
+//     saveUpdateAlert("Customer", "saved.");
+//
+//     // Add the customer object to the array
+//     customers.push(CustomerArray);
+//
+//     $("#txtCustomerId").val(generateCustomerID());
+//     loadAllCustomers();
+// });
 
-    // Create Object
-    let CustomerArray = new customer(
-        $("#txtCustomerId").val(),
-        $("#txtCustomerName").val(),
-        $("#txtCustomerAddress").val(),
-        $("#txtCustomerSalary").val()
-    );
+$("#btnCSave > button[type='button']").eq(0).on("click", () => {
+    let cus_id = $("#txtCustomerId").val();
+    let name = $("#txtCustomerName").val();
+    let address = $("#txtCustomerAddress").val();
+    let salary = $("#txtCustomerSalary").val();
 
-    clearTextFieldsC();
+    const customer = {
+        cus_id: cus_id,
+        name: name,
+        address: address,
+        salary: salary
+    };
 
-    // Alert Save
-    saveUpdateAlert("Customer", "saved.");
+    const custJSON = JSON.stringify(customer);
 
-    // Add the customer object to the array
-    customers.push(CustomerArray);
-
-    $("#txtCustomerId").val(generateCustomerID());
-    loadAllCustomers();
+    const sendAjax = (customerJSON) => {
+        $.ajax({
+            url: "http://localhost:8080/AAD-POS/customer",
+            type: "POST",
+            data: customerJSON,
+            contentType: "application/json",
+            success: function () {
+                loadAllCustomer();
+                $("#customerbtns>button[type='button']").eq(3).click();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Customer Saved Successful',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Please Check Text Field',
+                    text: 'Something went wrong!'
+                })
+            }
+        });
+    };
+    sendAjax(custJSON);
+    setTimeout(After1Minute, 60);
 });
+
+function After1Minute() {
+    generateCustomerID();
+    generateItemID();
+}
 
 /** Clear Text Fields in +New Customer * */
 $("#btnClearC").click(function () {
@@ -90,31 +144,102 @@ $('#btnSearchCus').keypress(function (event) {
 /**
  * Update Customer
  * */
-$("#bntUpdateCustomer").click(function () {
-    let CustomerId = $("#searchCustomerId").val();
-    let response2 = updateCustomers(CustomerId);
-    if (response2) {
-        saveUpdateAlert(CustomerId, "updated.");
-        clearCUTextFields();
-        checkValidity(customerValidationsUpdate);
-    } else {
-        unSucsessUpdateAlert(CustomerId);
-    }
+// $("#bntUpdateCustomer").click(function () {
+//     let CustomerId = $("#searchCustomerId").val();
+//     let response2 = updateCustomers(CustomerId);
+//     if (response2) {
+//         saveUpdateAlert(CustomerId, "updated.");
+//         clearCUTextFields();
+//         checkValidity(customerValidationsUpdate);
+//     } else {
+//         unSucsessUpdateAlert(CustomerId);
+//     }
+// });
+
+$("#customerbtns>button[type='button']").eq(1).on("click", () => {
+    let cus_id = $("#txtCustomerId").val();
+    let name = $("#txtCustomerName").val();
+    let address = $("#txtCustomerAddress").val();
+    let salary = $("#txtCustomerSalary").val();
+
+    const customer = {
+        cus_id: cus_id,
+        name: name,
+        address: address,
+        salary: salary
+    };
+
+    const custJSON = JSON.stringify(customer);
+
+    const sendAjax = (customerJSON) => {
+        $.ajax({
+            url: "http://localhost:8080/AAD-POS/customer",
+            type: "PUT",
+            data: customerJSON,
+            contentType: "application/json",
+            success: function () {
+                loadAllCustomer();
+                $("#customerbtns>button[type='button']").eq(3).click();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Customer Update Successful',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Please Check Text Field',
+                    text: 'Something went wrong!'
+                })
+            }
+        });
+    };
+    sendAjax(custJSON);
+    setTimeout(After1Minute, 60);
 });
 
-function updateCustomers(CustomerId) {
-    let customer = searchCustomer(CustomerId);
-    if (customer != null) {
-        customer.id = $("#searchCustomerId").val();
-        customer.name = $("#nameUpdate").val();
-        customer.address = $("#addressUpdate").val();
-        customer.salary = $("#salaryUpdate").val();
-        loadAllCustomers();
-        return true;
-    } else {
-        return false;
-    }
+//load all customer
+
+function loadAllCustomer() {
+    $("#customer-tbl-body").empty();
+
+    $("#selectCus_ID").empty();
+    $("#selectCus_ID").html(`<option className="options">Select Customer</option>`);
+
+    $.ajax({
+        url: "http://localhost:8080/AAD-POS/customer",
+        type: "GET",
+        success: function (response) {
+            for (const customer of response){
+                let record = `<tr><td class="cus_id">${customer.cus_id}</td><td class="name">${customer.name}</td><td class="nic">${customer.nic}</td><td class="address">${customer.address}</td></tr>`;
+                $("#customer-tbl-body").append(record);
+            }
+            for (const customer of response){
+                let recode = `<option class="options">${customer.name}</option>`
+                $("#selectCus_ID").append(recode);
+            }
+
+            lastCustomer = response[response.length - 1];
+            customerCount = response.length;
+        }
+    })
 }
+
+// function updateCustomers(CustomerId) {
+//     let customer = searchCustomer(CustomerId);
+//     if (customer != null) {
+//         customer.id = $("#searchCustomerId").val();
+//         customer.name = $("#nameUpdate").val();
+//         customer.address = $("#addressUpdate").val();
+//         customer.salary = $("#salaryUpdate").val();
+//         loadAllCustomers();
+//         return true;
+//     } else {
+//         return false;
+//     }
+// }
 
 /**
  * Clear Text Fields in Update Customer
@@ -130,35 +255,68 @@ function clearCUTextFields() {
     salaryUpdate.value = '';
 }
 
-/**
- * Delete Customer
- * */
-$("#btnDeleteCustomer").click(function () {
-    let deleteID = $("#searchCIdDelete").val();
+// /**
+//  * Delete Customer
+//  * */
+// $("#btnDeleteCustomer").click(function () {
+//     let deleteID = $("#searchCIdDelete").val();
+//
+//     yesNoAlertDelete(deleteID);
+// });
+//
+// /**
+//  * Search Id Enter Pressed And Load TextFields
+//  * */
+// $("#searchCIdDelete").keyup(function (event) {
+//     if (event.keyCode === 13) {
+//         var result = customers.find(({id}) => id === $("#searchCIdDelete").val());
+//         console.log(result);
+//
+//         if (result != null) {
+//             $("#searchCIdDelete").val(result.id);
+//             $("#disabledNameDelete").val(result.name);
+//             $("#disabledAddressDelete").val(result.address);
+//             $("#disabledSalaryDelete").val(result.salary);
+//         } else {
+//             emptyMassage();
+//             clearCDTextFields();
+//         }
+//     }
+// });
 
-    yesNoAlertDelete(deleteID);
-});
+// delete
 
-/**
- * Search Id Enter Pressed And Load TextFields
- * */
-$("#searchCIdDelete").keyup(function (event) {
-    if (event.keyCode === 13) {
-        var result = customers.find(({id}) => id === $("#searchCIdDelete").val());
-        console.log(result);
+$("#customerbtns>button[type='button']").eq(2).on("click", () => {
+    let cus_id = $("#cus_id").val();
 
-        if (result != null) {
-            $("#searchCIdDelete").val(result.id);
-            $("#disabledNameDelete").val(result.name);
-            $("#disabledAddressDelete").val(result.address);
-            $("#disabledSalaryDelete").val(result.salary);
-        } else {
-            emptyMassage();
-            clearCDTextFields();
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You want delete row?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire(
+                'Deleted!',
+                'Your row has been deleted.',
+                'success'
+            )
+            setTimeout(After1Minute, 60);
+            $("#customerbtns>button[type='button']").eq(3).click();
+            $.ajax({
+                url: "http://localhost:8080/AAD-POS/customer?cus_id="+cus_id,
+                type: "DELETE",
+                success: function () {
+                    $("#storebtns>button[type='button']").eq(3).click();
+                    loadAllCustomer();
+                }
+            });
         }
-    }
-});
-
+    })
+})
 /**
  * Clear Text Fields in Delete Customer
  * */
@@ -189,15 +347,33 @@ function loadAllCustomers() {
     $("#customerTable").empty();
 
     // Get all customer records from the array
-    for (var customer of customers) {
-        console.log(customer);// customer object
+    // for (var customer of customers) {
+    //     console.log(customer);// customer object
+    //
+    //     // Using String Literals to do the same thing as above
+    //     var row = `<tr><td>${customer.id}</td><td>${customer.name}</td><td>${customer.address}</td><td>${customer.salary}</td></tr>`;
+    //
+    //     //then add it to the table body of customer table
+    //     $("#customerTable").append(row);
+    // }
 
-        // Using String Literals to do the same thing as above
-        var row = `<tr><td>${customer.id}</td><td>${customer.name}</td><td>${customer.address}</td><td>${customer.salary}</td></tr>`;
+    $.ajax({
+        url: "http://localhost:8080/AAD-POS/customer",
+        type: "GET",
+        success: function (response) {
+            for (const customer of response){
+                let record = `<tr><td class="cus_id">${customer.cus_id}</td><td class="name">${customer.name}</td><td class="nic">${customer.nic}</td><td class="address">${customer.address}</td></tr>`;
+                $("#customer-tbl-body").append(record);
+            }
+            for (const customer of response){
+                let recode = `<option class="options">${customer.name}</option>`
+                $("#selectCus_ID").append(recode);
+            }
 
-        //then add it to the table body of customer table
-        $("#customerTable").append(row);
-    }
+            lastCustomer = response[response.length - 1];
+            customerCount = response.length;
+        }
+    })
     blindClickEvents();
     dblRowClickEventsCus();
     loadAllCustomersForOption();
@@ -240,13 +416,22 @@ function dblRowClickEventsCus() {
  * Generate New Customer ID
  * */
 function generateCustomerID() {
-    if (customers.length > 0) {
-        let lastId = customers[customers.length - 1].id;
-        let digit = lastId.substring(6);
-        let number = parseInt(digit) + 1;
-        return lastId.replace(digit, number);
+    // if (customers.length > 0) {
+    //     let lastId = customers[customers.length - 1].id;
+    //     let digit = lastId.substring(6);
+    //     let number = parseInt(digit) + 1;
+    //     return lastId.replace(digit, number);
+    // } else {
+    //     return "C00-001";
+    // }
+    if (customerCount === 0) {
+        $("#cus_id").val("C001");
     } else {
-        return "C00-001";
+        const lastID = lastCustomer.cus_id.split("C");
+        const lastNumber = parseInt(lastID[1], 10);
+        const newNumber = lastNumber + 1;
+        const newID = "C" + newNumber.toString().padStart(3, '0');
+        $("#cus_id").val(newID);
     }
 }
 
