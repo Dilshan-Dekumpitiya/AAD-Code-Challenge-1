@@ -33,10 +33,10 @@ $("#btnCSave > button[type='button']").eq(0).on("click", () => {
     let salary = $("#txtCustomerSalary").val();
 
     const customer = {
-        cus_id: cus_id,
-        name: name,
-        address: address,
-        salary: salary
+        txtCustomerId: cus_id,
+        txtCustomerName: name,
+        txtCustomerAddress: address,
+        txtCustomerSalary: salary
     };
 
     const custJSON = JSON.stringify(customer);
@@ -163,10 +163,10 @@ $("#customerbtns>button[type='button']").eq(1).on("click", () => {
     let salary = $("#txtCustomerSalary").val();
 
     const customer = {
-        cus_id: cus_id,
-        name: name,
-        address: address,
-        salary: salary
+        txtCustomerId: cus_id,
+        txtCustomerName: name,
+        txtCustomerAddress: address,
+        txtCustomerSalary: salary
     };
 
     const custJSON = JSON.stringify(customer);
