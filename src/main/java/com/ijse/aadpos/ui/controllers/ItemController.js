@@ -563,7 +563,7 @@ $("tbody").on("click", "tr", function() {
 });
 
 //Update
-$("#storebtns>button[type='button']").eq(1).on("click", () => {
+$("#updateItem>button[type='button']").eq(1).on("click", () => {
     let item_id = $("#txtItemsId").val();
     let item_name = $("#txtItemName").val();
     let quantity = $("#txtItemQty").val();
@@ -608,7 +608,7 @@ $("#storebtns>button[type='button']").eq(1).on("click", () => {
 });
 
 //Delete
-$("#storebtns>button[type='button']").eq(2).on("click", () => {
+$("#deleteItem>button[type='button']").eq(2).on("click", () => {
     let item_id = $("#txtItemsId").val();
 
     Swal.fire({
